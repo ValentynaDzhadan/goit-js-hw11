@@ -5,6 +5,11 @@ import Notiflix from 'notiflix';
 import { createMarkup } from './js/cardMarkup';
 import { fetchImages } from './js/fetchImages';
 
+let searchQuery;
+let page = 0;
+const perPage = 40;
+refs.loadMoreBtn.classList.add('visually-hidden');
+
 let lightbox = new SimpleLightbox('.gallery a', {
   captionDelay: 500,
   captions: true,
@@ -18,11 +23,6 @@ const refs = {
 };
 
 refs.formEl.addEventListener('submit', searchOnClick);
-
-let searchQuery;
-let page = 0;
-const perPage = 40;
-refs.loadMoreBtn.classList.add('visually-hidden');
 
 function searchOnClick(e) {
   e.preventDefault();
@@ -39,7 +39,6 @@ function searchOnClick(e) {
         renderMarkup(response);
         alertNumberOfImages(response.data.totalHits);
         lightbox.refresh();
-        // console.log(response.data);
         refs.loadMoreBtn.classList.remove('visually-hidden');
       }
     })
@@ -48,21 +47,20 @@ function searchOnClick(e) {
     });
 }
 
-function resetMarkup() {
-  refs.galleryEl.innerHTML = '';
-}
-
 function renderMarkup(response) {
   const markupCards = createMarkup(response);
   refs.galleryEl.insertAdjacentHTML('beforeend', markupCards);
 }
+function resetMarkup() {
+  refs.galleryEl.innerHTML = '';
+}
+
 function alertNoImage() {
   refs.loadMoreBtn.classList.add('visually-hidden');
   Notiflix.Notify.failure(
     'Sorry, there are no images matching your search query. Please try again.'
   );
 }
-
 function alertNumberOfImages(totalHits) {
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 }
