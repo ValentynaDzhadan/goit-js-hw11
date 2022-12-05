@@ -13,7 +13,7 @@ function createMarkup(response) {
         downloads,
       }) => {
         return `<div class="photo-card">
-  <a class="gallery-item" href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
+  <a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" /></a>
   <div class="info">
     <p class="info-item">
         <b>Likes</b>

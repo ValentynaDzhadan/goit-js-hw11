@@ -5,8 +5,8 @@ import Notiflix from 'notiflix';
 import { createMarkup } from './js/cardMarkup';
 import { fetchImages } from './js/fetchImages';
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  CaptionDelay: 250,
+let lightbox = new SimpleLightbox('.gallery a', {
+  captionDelay: 500,
   captions: true,
   captionsData: 'alt',
 });
@@ -38,6 +38,7 @@ function searchOnClick(e) {
         resetMarkup();
         renderMarkup(response);
         alertNumberOfImages(response.data.totalHits);
+        lightbox.refresh();
         // console.log(response.data);
         refs.loadMoreBtn.classList.remove('visually-hidden');
       }
@@ -63,7 +64,7 @@ function alertNoImage() {
 }
 
 function alertNumberOfImages(totalHits) {
-  Notiflix.Notify.failure(`Hooray! We found ${totalHits} images.`);
+  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 }
 
 /// pagination
@@ -75,16 +76,13 @@ function loadMoreOnClick() {
   fetchImages({ searchQuery, page })
     .then(response => {
       renderMarkup(response);
-      console.log(response.data);
-
+      lightbox.refresh();
+      //   smoothScroll();
       const totalPages = Math.ceil(response.data.totalHits / perPage);
-      console.log(totalPages);
-
-      if (page > totalPages) {
+      if (page >= totalPages) {
         alertNoMoreImage();
         refs.loadMoreBtn.classList.add('visually-hidden');
       } else {
-        console.log(response.data);
         let totalHits = response.data.totalHits - perPage * (page - 1);
         alertNumberOfImages(totalHits);
       }
@@ -96,7 +94,20 @@ function loadMoreOnClick() {
 
 function alertNoMoreImage() {
   refs.loadMoreBtn.classList.add('visually-hidden');
-  Notiflix.Notify.failure(
+  Notiflix.Notify.warning(
     "We're sorry, but you've reached the end of search results."
   );
+}
+
+// Smooth scroll
+
+function smoothScroll() {
+  const {
+    height: cardHeight,
+  } = refs.galleryEl.firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
