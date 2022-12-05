@@ -22,6 +22,7 @@ refs.formEl.addEventListener('submit', searchOnClick);
 let searchQuery;
 let page = 0;
 const perPage = 40;
+refs.loadMoreBtn.classList.add('visually-hidden');
 
 function searchOnClick(e) {
   e.preventDefault();
@@ -36,7 +37,9 @@ function searchOnClick(e) {
       } else {
         resetMarkup();
         renderMarkup(response);
-        // console.log(response.data.hits);
+        alertNumberOfImages(response.data.totalHits);
+        // console.log(response.data);
+        refs.loadMoreBtn.classList.remove('visually-hidden');
       }
     })
     .catch(error => {
@@ -53,26 +56,37 @@ function renderMarkup(response) {
   refs.galleryEl.insertAdjacentHTML('beforeend', markupCards);
 }
 function alertNoImage() {
+  refs.loadMoreBtn.classList.add('visually-hidden');
   Notiflix.Notify.failure(
     'Sorry, there are no images matching your search query. Please try again.'
   );
 }
 
-/// pagination
-refs.loadMoreBtn.addEventListener('click', loadMoreOnClick);
+function alertNumberOfImages(totalHits) {
+  Notiflix.Notify.failure(`Hooray! We found ${totalHits} images.`);
+}
 
+/// pagination
+
+refs.loadMoreBtn.addEventListener('click', loadMoreOnClick);
 function loadMoreOnClick() {
   page += 1;
+
   fetchImages({ searchQuery, page })
     .then(response => {
       renderMarkup(response);
+      console.log(response.data);
 
       const totalPages = Math.ceil(response.data.totalHits / perPage);
       console.log(totalPages);
 
       if (page > totalPages) {
         alertNoMoreImage();
-        // loadMoreBtn.classList.add('is-hidden');
+        refs.loadMoreBtn.classList.add('visually-hidden');
+      } else {
+        console.log(response.data);
+        let totalHits = response.data.totalHits - perPage * (page - 1);
+        alertNumberOfImages(totalHits);
       }
     })
     .catch(error => {
@@ -81,6 +95,7 @@ function loadMoreOnClick() {
 }
 
 function alertNoMoreImage() {
+  refs.loadMoreBtn.classList.add('visually-hidden');
   Notiflix.Notify.failure(
     "We're sorry, but you've reached the end of search results."
   );
